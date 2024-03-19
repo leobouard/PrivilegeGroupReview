@@ -11,7 +11,7 @@ $baseBody = Get-Content -Path $PSScriptRoot\body.html -Encoding UTF8
 
 $managers | ForEach-Object {
     $dn = $_.DistinguishedName
-    $body = $baseBody
+    $body = [string]$baseBody
     $groups | Sort-Object Name | Where-Object { $_.ManagedBy -eq $dn } | ForEach-Object {
         $members = Get-ADGroupMember -Identity $_ -Recursive | ForEach-Object { Get-ADUser $_ -Properties LastLogonDate }
         $members = $members | Sort-Object Name | Select-Object Name, UserPrincipalName, Enabled, LastLogonDate
@@ -26,7 +26,7 @@ $managers | ForEach-Object {
             Encoding   = 'UTF8'
             From       = 'noreply@domain.com'
             SmtpServer = 'smtp.domain.com'
-            Subject    = '[IT] Privilege group review'
+            Subject    = '[Active Directory] Privilege group review'
             To         = $_.EmailAddress
         }
         if ($TestRecipient) { $splat.To = $TestRecipient }
